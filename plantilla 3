@@ -1,0 +1,44 @@
+.include "m2560def.inc" 
+
+.org 0x0000
+
+
+
+main:
+    ; Inicialización del puntero de pila
+    ldi r16, high(RAMEND)  
+    out SPH, r16          
+    ldi r16, low(RAMEND)   
+    out SPL, r16          
+
+    ; Configuración del ADC
+    ldi r16, 0x40        
+    sts ADMUX, r16        
+
+    ldi r16, 0x80         
+    sts ADCSRA, r16       
+
+    ldi r16, 0x00
+    sts ADCSRB, r16      
+loop:
+    
+    ldi r18, 0xC0        
+    sts ADCSRA, r18      
+
+conversion:
+   
+    lds r17, ADCSRA       
+    andi r17, 0x40       
+    cpi r17, 0x00        
+    breq resultado     
+
+    
+    rjmp conversion
+
+resultado:
+    ; Leer el resultado
+    lds r16, ADCL          
+    lds r17, ADCH         
+
+    ; Repetir el proceso
+    rjmp loop
