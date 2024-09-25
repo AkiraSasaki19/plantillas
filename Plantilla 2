@@ -1,0 +1,81 @@
+;MICROCONTROLADOR ATMEGA328P
+
+;Archivos de cabecera
+.include "m328pdef.inc"
+
+;Define dirección de inicio de código
+.ORG 0x0000
+
+;Vector de interrupciones
+  JMP INT_MAIN        ;Reset Handler
+  JMP INT_EXT_INT0    ;IRQ0 Handler
+  JMP INT_EXT_INT1    ;IRQ1 Handler
+  JMP INT_PCINT0      ;PCINT0 Handler
+  JMP INT_PCINT1      ;PCINT1 Handler
+  JMP INT_PCINT2      ;PCINT2 Handler
+  JMP INT_WDT         ;Watchdog Timer Handler
+  JMP INT_TIM2_COMPA  ;Timer2 Compare A Handler
+  JMP INT_TIM2_COMPB  ;Timer2 Compare B Handler
+  JMP INT_TIM2_OVF    ;Timer2 Overflow Handler
+  JMP INT_TIM1_CAPT   ;Timer1 Capture Handler
+  JMP INT_TIM1_COMPA  ;Timer1 Compare A Handler
+  JMP INT_TIM1_COMPB  ;Timer1 Compare B Handler
+  JMP INT_TIM1_OVF    ;Timer1 Overflow Handler
+  JMP INT_TIM0_COMPA  ;Timer0 Compare A Handler
+  JMP INT_TIM0_COMPB  ;Timer0 Compare B Handler
+  JMP INT_TIM0_OVF    ;Timer0 Overflow Handler
+  JMP INT_SPI_STC     ;SPI Transfer Complete Handler
+  JMP INT_USART_RXC   ;USART, RX Complete Handler
+  JMP INT_USART_UDRE  ;USART, UDR Empty Handler
+  JMP INT_USART_TXC   ;USART, TX Complete Handler
+  JMP INT_ADC         ;ADC Conversion Complete Handler
+  JMP INT_EE_RDY      ;EEPROM Ready Handler
+  JMP INT_ANA_COMP    ;Analog Comparator Handler
+  JMP INT_TWI         ;2-wire Serial Interface Handler
+  JMP INT_SPM         ;SPM_RDYStore Program Memory Ready
+
+INT_MAIN:
+  ;Sección de inicialización del programa (setup)
+  ;Se inicia la PILA
+  LDI R16, LOW(RAMEND) 
+  OUT SPL, R16 
+  LDI R16, HIGH(RAMEND) 
+  OUT SPH, R16   
+    
+MAIN_LOOP: 
+  ;Sección de código del programa (loop)
+  NOP
+  NOP
+  NOP
+	RJMP MAIN_LOOP
+
+  INT_EXT_INT0:
+  INT_EXT_INT1:
+  INT_PCINT0:
+  INT_PCINT1:
+  INT_PCINT2:
+  INT_WDT:
+  INT_TIM2_COMPA:
+  INT_TIM2_COMPB:
+  INT_TIM2_OVF:
+  INT_TIM1_CAPT:
+  INT_TIM1_COMPA:
+  INT_TIM1_COMPB:
+  INT_TIM1_OVF:
+  INT_TIM0_COMPA:
+  INT_TIM0_COMPB:
+  INT_TIM0_OVF:
+  INT_SPI_STC:
+  INT_USART_RXC:
+  INT_USART_UDRE:
+  INT_USART_TXC:
+  INT_ADC:
+  INT_EE_RDY:
+  INT_ANA_COMP:
+  INT_TWI:
+  INT_SPM:
+    RETI
+
+  ;Sección de procedimientos
+  
+  ;Sección de todo los relacionado con "datos"
