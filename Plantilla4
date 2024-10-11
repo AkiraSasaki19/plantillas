@@ -1,0 +1,143 @@
+; Archivos de cabecera
+.include "m2560def.inc"
+
+; Define dirección de inicio de código
+.ORG 0x0000
+
+; Vector de interrupciones
+JMP INT_MAIN
+JMP INT_INT0
+; ... (omitiendo algunos vectores para brevedad)
+JMP INT_USART3_TXC
+
+INT_MAIN:
+    ; Configuración de la pila
+    ldi     R16, LOW(ramend)
+    out     SPL, R16
+    ldi     R16, HIGH(ramend)
+    out     SPH, R16
+
+    ; Configuración de los puertos
+    ; PA0 como entrada analógica, PA1 a PA7 como salida
+    ldi     R16, 0xFE       ; PA0 como entrada (0) y PA1 a PA7 como salida (1)
+    out     DDRA, R16
+    ldi     R16, 0x03       ; Configura PB0 y PB1 como salida
+    out     DDRB, R16
+    ldi     R16, 0xFE       ; Configura PC0 como entrada (0) y resto como salida
+    out     DDRC, R16
+    ldi     R16, 0xFF       ; Configura el puerto D completo como salida
+    out     DDRD, R16
+
+    ; Configuración del ADC
+    ldi     R16, 0b00000000 ; Selecciona A0 como entrada ADC
+    sts     ADMUX, R16
+    ldi     R16, 0b10000000 ; Habilita el ADC
+    sts     ADCSRA, R16
+
+    ; Configuración del Timer1
+    ldi     R16, 0b00000000 ; Modo normal
+    sts     TCCR1A, R16
+    ldi     R16, 0b00000010 ; Prescaler 8
+    sts     TCCR1B, R16
+    ldi     R16, 0x00        ; Parte alta del TOP
+    sts     ICR1H, R16
+    ldi     R16, 0x78       ; Parte baja del TOP
+    sts     ICR1L, R16
+
+    ; Configuración de interrupciones
+    cli
+    ldi     R16, 0b00000001 ; Activa la interrupción por sobreflujo del Timer1
+    sts     TIMSK1, R16
+    sei
+
+; Bucle principal
+MAIN_LOOP: 
+    rjmp MAIN_LOOP ; Bucle infinito
+
+; Manejadores de interrupciones
+INT_INT0:
+INT_INT1:
+INT_INT2:
+INT_INT3:
+INT_INT4:
+INT_INT5:
+INT_INT6:
+INT_INT7:
+INT_PCINT0:
+INT_PCINT1:
+INT_PCINT2:
+INT_WDT:
+INT_TIM2_COMPA:
+INT_TIM2_COMPB:
+INT_TIM2_OVF:
+INT_TIM1_CAPT:
+INT_TIM1_COMPA:
+INT_TIM1_COMPB:
+INT_TIM1_COMPC:
+INT_TIM1_OVF:
+    ; Manejo de la interrupción del Timer1
+    PUSH    R16
+    PUSH    R17
+
+    ; Procesamiento de datos
+    COM     R21
+    OUT     PORTC, R20
+    COM     R20
+    LDI     R20, 0b00000010
+    LDI     R16, 0b11000000
+    STS     ADCSRA, R16
+
+    ; Espera a que termine la conversión ADC
+WAIT_ADC:
+    LDS     R16, ADCSRA
+    ANDI    R16, 0b01000000
+    BRNE    WAIT_ADC
+
+    ; Envía los datos a los puertos B y D
+    LDS     R16, ADCL
+    OUT     PORTD, R16
+    LDS     R17, ADCH
+    OUT     PORTB, R17
+
+    POP     R17
+    POP     R16
+    RETI
+
+; Manejadores de otras interrupciones
+INT_TIM0_COMPA:
+INT_TIM0_COMPB:
+INT_TIM0_OVF:
+INT_SPI_STC:
+INT_USART0_RXC:
+INT_USART0_UDRE:
+INT_USART0_TXC:
+INT_ANA_COMP:
+INT_ADC:
+INT_EE_RDY:
+INT_TIM3_CAPT:
+INT_TIM3_COMPA:
+INT_TIM3_COMPB:
+INT_TIM3_COMPC:
+INT_TIM3_OVF:
+INT_USART1_RXC:
+INT_USART1_UDRE:
+INT_USART1_TXC:
+INT_TWI:
+INT_SPM_RDY:
+INT_TIM4_CAPT:
+INT_TIM4_COMPA:
+INT_TIM4_COMPB:
+INT_TIM4_COMPC:
+INT_TIM4_OVF:
+INT_TIM5_CAPT:
+INT_TIM5_COMPA:
+INT_TIM5_COMPB:
+INT_TIM5_COMPC:
+INT_TIM5_OVF:
+INT_USART2_RXC:
+INT_USART2_UDRE:
+INT_USART2_TXC:
+INT_USART3_RXC:
+INT_USART3_UDRE:
+INT_USART3_TXC:
+    RETI
