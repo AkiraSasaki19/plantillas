@@ -1,0 +1,77 @@
+#include <Wire.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
+
+// Configuración del tamaño de la pantalla OLED
+#define SCREEN_WIDTH 128
+#define SCREEN_HEIGHT 64
+
+// Dirección I2C de la pantalla OLED
+#define OLED_ADDR 0x3C
+
+// Creación del objeto para la pantalla OLED
+Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire);
+
+// Pines para los LEDs y el sensor de luz
+int gPin = 9;       // Pin para el LED verde
+int rPin = 8;       // Pin para el LED rojo
+int lightPin = A3;  // Pin para leer el valor del sensor de luz (entrada analógica A3)
+int lightVal;       // Variable para almacenar el valor de lectura del sensor de luz
+int dt = 100;       // Tiempo de retraso entre lecturas (en milisegundos)
+
+void setup() {
+  Serial.begin(9600);
+
+  // Inicialización del bus I2C
+  Wire.begin(); // Usa los pines nativos del Arduino Mega: SDA (20), SCL (21)
+
+// Inicialización de la pantalla OLED
+if (!display.begin(SSD1306_SWITCHCAPVCC, OLED_ADDR)) {
+  Serial.println(F("Error al inicializar la pantalla OLED"));
+  while (true); // Detiene el programa si hay un error
+}
+  // Limpia la pantalla
+  display.clearDisplay();
+
+  // Configuración del texto
+  display.setTextSize(1);
+  display.setTextColor(SSD1306_WHITE);
+  display.setCursor(0, 10);
+  display.println("Sensor de Luz:");
+
+  // Configuración de los pines de los LEDs
+  pinMode(lightPin, INPUT);
+  pinMode(gPin, OUTPUT);
+  pinMode(rPin, OUTPUT);
+}
+
+void loop() {
+  // Leer el valor del sensor de luz
+  lightVal = analogRead(lightPin);
+  Serial.println(lightVal);
+
+  // Mostrar el valor del sensor en la pantalla OLED
+  display.clearDisplay(); // Limpiar pantalla
+  display.setCursor(0, 10);
+  display.print("Valor Luz: ");
+  display.println(lightVal);
+
+  // Control de los LEDs en base al valor del sensor
+  if (lightVal < 700) {
+    digitalWrite(gPin, 1);  // Enciende el LED verde
+    digitalWrite(rPin, 0);  // Apaga el LED rojo
+    display.setCursor(0, 30);
+    display.println("LED Verde ON");
+  } else {
+    digitalWrite(gPin, 0);  // Apaga el LED verde
+    digitalWrite(rPin, 1);  // Enciende el LED rojo
+    display.setCursor(0, 30);
+    display.println("LED Rojo ON");
+  }
+
+  // Muestra los cambios en la pantalla
+  display.display();
+
+  // Retardo entre lecturas
+  delay(dt);
+}
