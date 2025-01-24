@@ -1,0 +1,26 @@
+const int ldrPin = A0; // Pin analógico del fotoresistor
+const int ledPin = 7;  // Pin digital donde está conectado el LED físico
+const int threshold = 500; // Umbral para detectar poca luz
+
+void setup() {
+  pinMode(ledPin, OUTPUT); // Configurar el LED como salida
+  Serial.begin(9600);      // Iniciar comunicación serie
+}
+
+void loop() {
+  int ldrValue = analogRead(ldrPin); // Leer el valor del fotoresistor
+
+  Serial.print("Valor del LDR: ");
+  Serial.println(ldrValue); // Mostrar el valor en el Monitor Serie
+
+  if (ldrValue < threshold) {
+    // Si hay poca luz, hacer que el LED parpadee
+    digitalWrite(ledPin, HIGH); // Encender el LED
+    delay(1000);                // Esperar 1 segundo (puedes ajustar)
+    digitalWrite(ledPin, LOW);  // Apagar el LED
+    delay(1000);                // Esperar 1 segundo (puedes ajustar)
+  } else {
+    // Si hay suficiente luz, mantener el LED apagado
+    digitalWrite(ledPin, LOW);
+  }
+}
